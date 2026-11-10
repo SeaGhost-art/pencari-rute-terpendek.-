@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#102a43">
+  <title>Pencari Rute Terpendek</title>
+  <style>
+    :root {
+      --navy: #102a43;
+      --blue: #1769aa;
+      --sky: #eaf4ff;
+      --ink: #243b53;
+      --muted: #627d98;
+      --line: #d9e2ec;
+      --green: #137c55;
+      --red: #b42318;
+      --surface: #ffffff;
+      --bg: #f3f7fb;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 28px 16px;
+      background: radial-gradient(circle at top left, #e2f1ff 0, transparent 38%), var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .wrap { width: min(760px, 100%); margin: 0 auto; }
+    header { text-align: center; margin: 12px 0 26px; }
+    .eyebrow {
+      display: inline-block; padding: 6px 11px; border-radius: 999px;
+      background: #dceeff; color: #14558b; font-size: .78rem; font-weight: 700;
+      letter-spacing: .04em; text-transform: uppercase;
+    }
+    h1 { color: var(--navy); font-size: clamp(1.8rem, 5vw, 2.5rem); margin: 14px 0 8px; }
+    header p { color: var(--muted); margin: 0; line-height: 1.6; }
+    .card {
+      background: var(--surface); border: 1px solid var(--line); border-radius: 22px;
+      padding: clamp(20px, 5vw, 32px); box-shadow: 0 16px 40px rgba(16,42,67,.08);
+    }
+    .section-title { margin: 0 0 7px; color: var(--navy); font-size: 1.15rem; }
+    .hint { margin: 0 0 22px; color: var(--muted); font-size: .92rem; line-height: 1.5; }
+    .inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .field {
+      border: 1px solid var(--line); border-radius: 16px; padding: 16px;
+      background: #fbfdff;
+    }
+    label { display: block; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
+    .field small { display: block; color: var(--muted); margin-top: 8px; }
+    .input-row { display: flex; align-items: center; gap: 9px; }
+    input {
+      width: 100%; min-width: 0; border: 1px solid #bcccdc; border-radius: 10px;
+      padding: 12px; font: inherit; font-size: 1.05rem; color: var(--ink);
+      background: white; outline: none;
+    }
+    input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px #d7ebff; }
+    .unit { color: var(--muted); font-weight: 700; }
+    .actions { display: flex; gap: 10px; margin-top: 22px; }
+    button {
+      border: 0; border-radius: 12px; padding: 13px 18px; font: inherit;
+      font-weight: 700; cursor: pointer; transition: transform .12s, opacity .12s;
+    }
+    button:active { transform: scale(.98); }
+    .primary { flex: 1; color: white; background: var(--blue); }
+    .secondary { color: var(--ink); background: #edf2f7; }
+    button:focus-visible { outline: 3px solid #90cdf4; outline-offset: 2px; }
+    .error { color: var(--red); margin: 14px 0 0; font-size: .9rem; min-height: 1.2em; }
+    .result {
+      display: none; margin-top: 22px; padding: 20px; border-radius: 16px;
+      background: var(--sky); border: 1px solid #c5e2ff;
+    }
+    .result.show { display: block; }
+    .result h2 { color: var(--navy); margin: 0 0 8px; font-size: 1.15rem; }
+    .result p { margin: 6px 0; line-height: 1.55; }
+    .winner { color: var(--green); font-weight: 800; }
+    .same { color: #8a5700; font-weight: 800; }
+    .comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+    .stat { padding: 13px; background: white; border: 1px solid var(--line); border-radius: 12px; }
+    .stat span { display: block; color: var(--muted); font-size: .82rem; }
+    .stat strong { display: block; color: var(--navy); font-size: 1.25rem; margin-top: 4px; }
+    footer { text-align: center; color: var(--muted); font-size: .82rem; margin: 20px 0 4px; }
+    @media (max-width: 560px) {
+      body { padding: 18px 12px; }
+      .inputs { grid-template-columns: 1fr; }
+      .actions { flex-direction: column; }
+      .secondary { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <span class="eyebrow">Proyek Python • Versi Web</span>
+      <h1>Pencari Rute Terpendek</h1>
+      <p>Masukkan jarak dua rute, lalu bandingkan untuk mengetahui perjalanan yang paling pendek.</p>
+    </header>
+
+    <section class="card" aria-labelledby="form-title">
+      <h2 class="section-title" id="form-title">Masukkan jarak perjalanan</h2>
+      <p class="hint">Isi jarak Rute 1 dan Rute 2 dalam kilometer (km). Angka desimal juga bisa digunakan.</p>
+
+      <form id="routeForm" novalidate>
+        <div class="inputs">
+          <div class="field">
+            <label for="route1">Jarak Rute 1</label>
+            <div class="input-row">
+              <input id="route1" name="route1" type="number" min="0" step="any" placeholder="Contoh: 12.5" inputmode="decimal" required>
+              <span class="unit">km</span>
+            </div>
+            <small>Masukkan jarak rute pertama.</small>
+          </div>
+          <div class="field">
+            <label for="route2">Jarak Rute 2</label>
+            <div class="input-row">
+              <input id="route2" name="route2" type="number" min="0" step="any" placeholder="Contoh: 10" inputmode="decimal" required>
+              <span class="unit">km</span>
+            </div>
+            <small>Masukkan jarak rute kedua.</small>
+          </div>
+        </div>
+
+        <p class="error" id="error" role="alert" aria-live="polite"></p>
+        <div class="actions">
+          <button class="primary" type="submit">Bandingkan Rute</button>
+          <button class="secondary" type="reset">Reset</button>
+        </div>
+      </form>
+
+      <section class="result" id="result" aria-live="polite" aria-atomic="true">
+        <h2>Hasil perbandingan</h2>
+        <p id="message"></p>
+        <div class="comparison">
+          <div class="stat"><span>Jarak Rute 1</span><strong id="value1">—</strong></div>
+          <div class="stat"><span>Jarak Rute 2</span><strong id="value2">—</strong></div>
+        </div>
+      </section>
+    </section>
+    <footer>Program sederhana untuk menentukan rute perjalanan terpendek.</footer>
+  </main>
+
+  <script>
+    const form = document.getElementById("routeForm");
+    const route1Input = document.getElementById("route1");
+    const route2Input = document.getElementById("route2");
+    const error = document.getElementById("error");
+    const result = document.getElementById("result");
+    const message = document.getElementById("message");
+
+    function formatKm(value) {
+      return new Intl.NumberFormat("id-ID", {
+        maximumFractionDigits: 2
+      }).format(value) + " km";
+    }
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      const route1 = route1Input.value.trim();
+      const route2 = route2Input.value.trim();
+
+      if (route1 === "" || route2 === "") {
+        error.textContent = "Kedua jarak rute harus diisi terlebih dahulu.";
+        result.classList.remove("show");
+        return;
+      }
+
+      const distance1 = Number(route1);
+      const distance2 = Number(route2);
+
+      if (!Number.isFinite(distance1) || !Number.isFinite(distance2) ||
+          distance1 < 0 || distance2 < 0) {
+        error.textContent = "Masukkan angka jarak yang valid dan tidak boleh negatif.";
+        result.classList.remove("show");
+        return;
+      }
+
+      error.textContent = "";
+      document.getElementById("value1").textContent = formatKm(distance1);
+      document.getElementById("value2").textContent = formatKm(distance2);
+
+      if (distance1 < distance2) {
+        message.innerHTML = '<span class="winner">Rute 1 adalah rute terpendek.</span><br>' +
+          "Rute 1 lebih pendek " + formatKm(distance2 - distance1) + " dibandingkan Rute 2.";
+      } else if (distance2 < distance1) {
+        message.innerHTML = '<span class="winner">Rute 2 adalah rute terpendek.</span><br>' +
+          "Rute 2 lebih pendek " + formatKm(distance1 - distance2) + " dibandingkan Rute 1.";
+      } else {
+        message.innerHTML = '<span class="same">Kedua rute memiliki jarak yang sama.</span>';
+      }
+
+      result.classList.add("show");
+    });
+
+    form.addEventListener("reset", function () {
+      error.textContent = "";
+      result.classList.remove("show");
+      message.textContent = "";
+    });
+  </script>
+</body>
+</html>
